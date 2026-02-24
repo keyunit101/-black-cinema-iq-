@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Black Cinema IQ 🎬
 
-## Getting Started
+An addictive, timed quiz game about iconic Black films from the golden era of Black cinema (1988–2002).
 
-First, run the development server:
+## Tech Stack
+
+- **Next.js 14** (App Router)
+- **TypeScript**
+- **Tailwind CSS**
+- **Web Audio API** — all sounds generated in code, zero audio files
+- No external UI libraries — 100% custom
+
+## Local Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploy to Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Option 1 — Vercel CLI
 
-## Learn More
+```bash
+npx vercel --prod
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Option 2 — GitHub → Vercel Dashboard
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Push this repo to GitHub
+2. Go to [vercel.com/new](https://vercel.com/new)
+3. Import your GitHub repo
+4. Framework: **Next.js** (auto-detected)
+5. Click **Deploy** — done
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Leaderboard Note
 
-## Deploy on Vercel
+The leaderboard uses **in-memory storage** and resets on every redeploy.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Upgrade to Supabase (persistence)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Create a project at [supabase.com](https://supabase.com)
+2. Run this SQL:
+
+```sql
+create table leaderboard (
+  id uuid default gen_random_uuid() primary key,
+  name text not null unique,
+  score integer not null default 0,
+  streak integer not null default 0,
+  correct integer not null default 0,
+  total integer not null default 0,
+  submitted_at timestamptz default now()
+);
+create index on leaderboard (score desc);
+```
+
+3. `npm install @supabase/supabase-js`
+4. Add to `.env.local`:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your-url
+   SUPABASE_SERVICE_ROLE_KEY=your-key
+   ```
+5. Update `src/app/api/leaderboard/route.ts` to use Supabase upsert.
+
+## Films Covered
+
+| Film | Year |
+|------|------|
+| Boyz N the Hood | 1991 |
+| Set It Off | 1996 |
+| Friday | 1995 |
+| Coming to America | 1988 |
+| New Jack City | 1991 |
+| Waiting to Exhale | 1995 |
+| Love Jones | 1997 |
+| The Players Club | 1998 |
+| Belly | 1998 |
+| Brown Sugar | 2002 |
+| B.A.P.S. | 1997 |
+| How to Be a Player | 1997 |
